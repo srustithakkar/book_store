@@ -1,8 +1,8 @@
-// import { combineReducers } from 'redux';
-// import questionReducer from "../_reducers/questions.reducer"
+import { combineReducers } from 'redux';
+import BooksReducer from "./book.reducer"
 
-// const rootReducer = combineReducers({
-//     questionReducer
-// });
+const rootReducer = combineReducers({
+    BooksReducer
+});
 
-// export default rootReducer;
+export default rootReducer;

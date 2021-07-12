@@ -15,7 +15,7 @@ export const DialogTitle = withStyles(theme => ({
     closeButton: {
         position: 'absolute',
         right: theme.spacing(1),
-        top: theme.spacing(1),
+        top: theme.spacing(0),
         color: theme.palette.grey[500],
     },
 }))(props => {

@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.css';
-import Home from "./components/Home"
+import Home from "./Components/Home"
 
 function App () {
-        return (
-            <div className="h-100">
-                <Home />
-            </div>
-        );
-    }
+    return (
+        <div className="h-100">
+            <Home />
+        </div>
+    );
+}
 
 export default App

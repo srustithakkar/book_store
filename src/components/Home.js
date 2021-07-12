@@ -1,94 +1,123 @@
-import React, { useEffect, useState } from 'react';
-import {connect} from "react-redux";
-import QuestionAction from "../_actions/questions.action";
-import QuestionCard from "../components/Card";
-import QuestionDialog from "./Details";
+import React, {useEffect, useState, Suspense} from "react"
+import {connect} from "react-redux"
+import BookAction from "../_actions/book.action"
+import { Carousel } from 'react-responsive-carousel'
+import Book from "./Book.js"
 import Dialog from '@material-ui/core/Dialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Loading from "./loading"
+import CardDialog from "./CardDialog"
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import { sortBy } from "lodash"
 
-/**
-  * @param {*} props
-  * component for mapping data recived from reducer.
-  * contains Dialog
-  * @returns {Component} Home
-  */
+
 function Home (props) {
-    const {questions} = props;
-    const [open, setOpen] = useState(false);
-    const [question, setQuestion] = useState(null)
-
-    /**
-     * @param {Event} ev
-     * @param {Object} question
-     * toggle dialog component
-     * setQuestions
-     */
-    const openQuestionDialog = (ev, question) => {
-        setQuestion(question);
-        setOpen(true);
-    }
-
-    /**
-     * @param {Event} ev
-     * toggle dialog component
-     */
-    const closeQuestionDialog = (ev) => {
-        setOpen(false);
-    }
-
-    /**
-     * Wrapper for getQuestion() action
-     */
-    const callGetQuestions = () => {
-        //pass page + 1 and limit on each scroll-end to get new 20 questions
-        props.getQuestions(props.page + 1, 20)
-    }
-
+    const [book, setBook] = useState()
+    const [open, setOpen] = useState(false)
+    const [sort, setSort] = useState()
     useEffect(()=>{
-        props.getQuestions()
+        props.getBooks()
     },[])
 
-    return (
-        <div
-            style={{
-                overflow: 'auto',
-                display: 'flex',
-                flexDirection: 'column-reverse',
-        }}>
-            <InfiniteScroll
-                dataLength={books.length}
-                next={callGetQuestions}
-                hasMore={true}
-                loader={<Loading/>}
-            >
-                {questions && questions.map((question) => (
-                    <QuestionCard openQuestionDialog={openQuestionDialog} question={question}/>
-                ))}
-            </InfiniteScroll>
-            <Dialog
-                    open={open}
-                    aria-labelledby="question dialog"
-                    maxWidth="sm"
-                    fullWidth>
-                    <QuestionDialog question={question}  closeQuestionDialog={closeQuestionDialog} />
-            </Dialog>
+    const openDialog = (ev, book) => {
+        console.log("i am book",book)
+        console.log("i am open",open)
+        setBook(book)
+        setOpen(true)
+    }
+    const loadBooks = () => {
+        debugger
+        props.getBooks(props.skip, props.skip + 20)
+    }
+    const handleChange = (ev) => {
+        setSort(ev.target.value) 
+    }
+    let closeDialog = () => {
+        setOpen(false)
+    }
+    let {books} =  props
+    
+    return(
+        <div>
+            <nav class="navbar-dark bg-dark justify-content-between border-bottom container-fluid">
+                <div className="row">
+                    <div className="col-6 m-auto">
+                        <div class="navbar-brand ">BookStore</div>
+                    </div>
+                    <div className="col-6">
+                        <div className="row">
+                            <div className="col-6 m-auto">
+                                <form class="form-inline ">
+                                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
+                                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                                </form>
+                            </div>
+                            <div className="col-6">
+                                <FormControl variant="filled" className="p-0" margin="dense" fullWidth >
+                                    <InputLabel id="demo-simple-select-label" className="bg-light">Sort By</InputLabel>
+                                        <Select
+                                            className="bg-light"
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={sort}
+                                            onChange={handleChange}
+                                        >
+                                        <MenuItem value="">None</MenuItem>
+                                        <MenuItem value="title">Title</MenuItem>
+                                        <MenuItem value="author">Author</MenuItem>
+                                        <MenuItem value="date">Date</MenuItem>
+                                        </Select>
+                                </FormControl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <div className="container-fluid bg-dark p-4">
+                <InfiniteScroll
+                dataLength={books.length} //This is important field to render the next data
+                next={loadBooks}
+                hasMore={props.hasMoreData}
+                loader={<h4>Loading...</h4>}
+                endMessage={
+                    <p style={{ textAlign: 'center' }}>
+                    <b>Yay! You have seen it all</b>
+                    </p>
+                }>
+                <div className="row">
+                    {books.map((book) => {
+                        return (
+                            <React.Fragment key={book.index}>
+                                <Book book= {book} openDialog={openDialog} />
+                            </React.Fragment>
+                        ) 
+                    })}
+                </div>
+                </InfiniteScroll>
+                <Dialog open={open} >
+                    <CardDialog book={book} closeDialog={closeDialog} />
+                </Dialog>
+            </div>
         </div>
-    );
+
+    )
 }
 
-// const mapStateToProps = (state) => {
-//     return{
-//         questions: state.questionReducer.questions,
-//         page: state.questionReducer.page,
-//         loading: state.questionReducer.loading
-//     }
-// }
+const mapStateToProps = (state) => {
+    console.log("this is state",state)
+    return{
+        books: state.BooksReducer.books,
+        skip: state.BooksReducer.skip,
+        hasMoreData: state.BooksReducer.hasMoreData
+    }
+}
 
-// const mapDispatchToProps = (dispatch) => {
-//     return {
-//         getQuestions : (page, skip) => dispatch(QuestionAction.getQuestions(page, skip))
-//     }
-// }
-// export default connect(mapStateToProps, mapDispatchToProps)(Home)
-export default Home
+const mapDispatchToProps = (dispatch) => {
+    return {
+        getBooks: (skip, limit) => dispatch(BookAction.getBooks(skip, limit))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

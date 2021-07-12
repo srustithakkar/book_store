@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Provider } from 'react-redux';
-// import { store } from './_helpers';
-import './index.css';
+import { store } from './_helpers';
 import App from './App';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 
 ReactDOM.render(
-    // <Provider store={store}>
+    <Provider store={store}>
         <App />
-    // </Provider>
+    </Provider>
     , document.getElementById('root')
 );
