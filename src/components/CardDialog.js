@@ -1,9 +1,8 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import {DialogTitle, DialogContent} from '../_helpers/dialog';
 
 export default function BookDailogue(props) {
-    const {book, closeDialog} = props;
-    console.log(book.profile_photo)
+    const {book} = props;
     return (
         <div>
             <DialogTitle id="question-dialog" className="text-center" onClose={props.closeDialog}>Author Info</DialogTitle>

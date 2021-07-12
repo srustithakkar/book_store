@@ -1,7 +1,6 @@
-import React, {useEffect, useState, Suspense} from "react"
+import React, {useEffect, useState} from "react"
 import {connect} from "react-redux"
 import BookAction from "../_actions/book.action"
-import { Carousel } from 'react-responsive-carousel'
 import Book from "./Book.js"
 import Dialog from '@material-ui/core/Dialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -10,51 +9,43 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import { sortBy } from "lodash"
 
 
 function Home (props) {
     const [book, setBook] = useState()
     const [open, setOpen] = useState(false)
     const [sort, setSort] = useState()
+
     useEffect(()=>{
         props.getBooks()
     },[])
 
     const openDialog = (ev, book) => {
-        console.log("i am book",book)
-        console.log("i am open",open)
         setBook(book)
         setOpen(true)
     }
     const loadBooks = () => {
-        debugger
         props.getBooks(props.skip, props.skip + 20)
     }
     const handleChange = (ev) => {
         setSort(ev.target.value) 
+        props.sortBookBy(ev.target.value)
     }
-    let closeDialog = () => {
+    const closeDialog = () => {
         setOpen(false)
     }
-    let {books} =  props
+    const {books} =  props
     
     return(
         <div>
             <nav class="navbar-dark bg-dark justify-content-between border-bottom container-fluid">
                 <div className="row">
-                    <div className="col-6 m-auto">
+                    <div className="col-9 m-auto">
                         <div class="navbar-brand ">BookStore</div>
                     </div>
-                    <div className="col-6">
+                    <div className="col-3">
                         <div className="row">
-                            <div className="col-6 m-auto">
-                                <form class="form-inline ">
-                                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
-                                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                                </form>
-                            </div>
-                            <div className="col-6">
+                            <div className="col-12">
                                 <FormControl variant="filled" className="p-0" margin="dense" fullWidth >
                                     <InputLabel id="demo-simple-select-label" className="bg-light">Sort By</InputLabel>
                                         <Select
@@ -64,7 +55,7 @@ function Home (props) {
                                             value={sort}
                                             onChange={handleChange}
                                         >
-                                        <MenuItem value="">None</MenuItem>
+                                        <MenuItem value="none">None</MenuItem>
                                         <MenuItem value="title">Title</MenuItem>
                                         <MenuItem value="author">Author</MenuItem>
                                         <MenuItem value="date">Date</MenuItem>
@@ -106,7 +97,6 @@ function Home (props) {
 }
 
 const mapStateToProps = (state) => {
-    console.log("this is state",state)
     return{
         books: state.BooksReducer.books,
         skip: state.BooksReducer.skip,
@@ -116,7 +106,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        getBooks: (skip, limit) => dispatch(BookAction.getBooks(skip, limit))
+        getBooks: (skip, limit) => dispatch(BookAction.getBooks(skip, limit)),
+        sortBookBy: (sort) => dispatch(BookAction.sortBookBy(sort))
     }
 }
 

@@ -1,7 +1,7 @@
 import BookConstant from "../_constants/book.constants"
 
 const BookAction = {
-    getBooks
+    getBooks, sortBookBy
 }
 
 function getBooks (skip = 0 , limit = 20) {
@@ -10,9 +10,10 @@ function getBooks (skip = 0 , limit = 20) {
         payload: {skip, limit}
     }
 }
-function sortBook () {
+function sortBookBy (sort) {
     return {
-        type: BookConstant.SORT_BOOK
+        type: BookConstant.SORT_BOOK,
+        payload: sort
     }
 }
 
